@@ -574,20 +574,19 @@ function BusinessLogin({ onLogin, onBack }: { onLogin: (u: string, p: string) =>
 }
 
 function BusinessPortal({
-  businessUsername,
   businessName,
   products,
   orders,
   onPlaceOrder,
   onGoCatalog,
 }: {
-  businessUsername: string;
   businessName: string;
   products: Product[];
   orders: Order[];
   onPlaceOrder: (items: OrderItem[], option: DeliveryOption) => string | null;
   onGoCatalog: () => void;
 }) {
+
   type CartLine = { productId: string; qty: number };
   const [cart, setCart] = useState<CartLine[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
