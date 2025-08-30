@@ -398,7 +398,6 @@ export default function PawnshopPortalApp() {
 
           {route === "businessPortal" && session?.role === "business" && (
             <BusinessPortal
-              businessUsername={session.username}
               businessName={session.displayName}
               products={products}
               orders={orders.filter((o) => o.business === session.username)}
@@ -586,7 +585,6 @@ function BusinessPortal({
   onPlaceOrder: (items: OrderItem[], option: DeliveryOption) => string | null;
   onGoCatalog: () => void;
 }) {
-
   type CartLine = { productId: string; qty: number };
   const [cart, setCart] = useState<CartLine[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
