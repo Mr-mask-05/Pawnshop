@@ -742,8 +742,13 @@ function BusinessPortal({
                   <div className="font-medium">Order #{o.id}</div>
                   <div className="text-sm text-gray-600">{new Date(o.createdAt).toLocaleString()}</div>
                 </div>
-                <div className="text-sm text-gray-600 dark:text-neutral-400">
-                  Status: <b>{prettyStatus(o.status)}</b> • {o.delivery === "pickup" ? (o.pickupCode ? `Pickup code: ${o.pickupCode}` : "Pickup") : "Delivery"}
+                <StatusTimeline status={o.status} />
+                <div className="mt-1 text-sm text-gray-600 dark:text-neutral-400">
+                  {o.delivery === "pickup"
+                    ? o.pickupCode
+                      ? `Pickup code: ${o.pickupCode}`
+                      : "Pickup"
+                    : "Delivery"}
                 </div>
                 <div className="mt-1 font-semibold">{money(o.total)}</div>
               </div>
@@ -1058,6 +1063,7 @@ function OrdersTab({
                       Paid
                     </label>
                   </div>
+                  <StatusTimeline status={o.status} />
                   {o.pickupCode && (
                     <div className="rounded-xl border border-dashed border-gray-300 p-2 text-sm dark:border-neutral-700">
                       Pickup code: <b>{o.pickupCode}</b>
@@ -1398,6 +1404,46 @@ function prettyStatus(s: FulfillmentStatus) {
     default:
       return s;
   }
+}
+
+const ORDER_FLOW: FulfillmentStatus[] = [
+  "placed",
+  "accepted",
+  "processing",
+  "out_for_delivery",
+  "ready_for_pickup",
+  "fulfilled",
+];
+
+function StatusTimeline({
+  status,
+}: {
+  status: FulfillmentStatus;
+}) {
+  return (
+    <ol className="flex items-center text-xs">
+      {ORDER_FLOW.map((s, i) => {
+        const activeIndex = ORDER_FLOW.indexOf(status);
+        const done = i < activeIndex;
+        const active = i === activeIndex;
+        return (
+          <li key={s} className="flex-1">
+            <div
+              className={`border-b-2 p-1 text-center ${
+                active
+                  ? "border-blue-500 font-semibold"
+                  : done
+                  ? "border-green-500 text-green-600"
+                  : "border-gray-300 text-gray-400"
+              }`}
+            >
+              {prettyStatus(s)}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
 }
 
 /* ================== Apply Page ================== */
