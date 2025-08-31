@@ -1,5 +1,5 @@
 import React from 'react';
-import { auth } from '../../lib/auth';
+import { auth } from '../../../lib/auth';
 
 export default async function AccountPage() {
   const session = await auth();
