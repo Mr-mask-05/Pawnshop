@@ -3,10 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev": "prisma generate --schema ./prisma/schema.prisma && next dev",
-    "build": "prisma generate --schema ./prisma/schema.prisma && next build",
+    "dev": "node scripts/prisma-generate.js && next dev",
+    "build": "node scripts/prisma-generate.js && next build",
     "start": "next start",
-    "postinstall": "prisma generate --schema ./prisma/schema.prisma",
+    "postinstall": "node scripts/prisma-generate.js",
     "seed": "tsx prisma/seed.ts"
   },
   "prisma": {

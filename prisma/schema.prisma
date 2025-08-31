@@ -23,20 +23,20 @@ enum BizRole {
 }
 
 model User {
-  id                 String   @id @default(cuid())
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  username           String   @unique
+  id                 String     @id @default(cuid())
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  username           String     @unique
   displayName        String
-  email              String?  @unique
+  email              String?    @unique
   hashedPassword     String
-  mustChangePassword Boolean  @default(false)
+  mustChangePassword Boolean    @default(false)
   stateId            String?
-  mustAddStateId     Boolean  @default(true)
+  mustAddStateId     Boolean    @default(true)
   staffRole          StaffRole?
   bizRole            BizRole?
   businessId         String?
-  business           Business? @relation(fields: [businessId], references: [id])
+  business           Business?  @relation(fields: [businessId], references: [id])
   emailVerified      DateTime?
   // Back-relations
   ordersPlaced       Order[]
@@ -44,23 +44,23 @@ model User {
 }
 
 model Business {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  name        String   @unique
-  discountPct Int      @default(0)
+  id          String     @id @default(cuid())
+  createdAt   DateTime   @default(now())
+  name        String     @unique
+  discountPct Int        @default(0)
   users       User[]
   orders      Order[]
   preorders   Preorder[]
 }
 
 model Product {
-  id            String   @id @default(cuid())
-  createdAt     DateTime @default(now())
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
   name          String
   description   String?
   publicPrice   Int
   businessPrice Int
-  stock         Int      @default(0)
+  stock         Int            @default(0)
   image         String?
   cardSize      String?
   orderItems    OrderItem[]
@@ -68,18 +68,18 @@ model Product {
 }
 
 model Order {
-  id           String   @id @default(cuid())
-  createdAt    DateTime @default(now())
-  businessId   String
-  business     Business @relation(fields: [businessId], references: [id])
-  placedById   String
-  placedBy     User     @relation(fields: [placedById], references: [id])
-  delivery     String
-  status       String
-  total        Int
-  pickupCode   String?
-  items        OrderItem[]
-  invoicePaid  Boolean  @default(false)
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  businessId  String
+  business    Business    @relation(fields: [businessId], references: [id])
+  placedById  String
+  placedBy    User        @relation(fields: [placedById], references: [id])
+  delivery    String
+  status      String
+  total       Int
+  pickupCode  String?
+  items       OrderItem[]
+  invoicePaid Boolean     @default(false)
 }
 
 model OrderItem {
@@ -93,19 +93,19 @@ model OrderItem {
 }
 
 model Preorder {
-  id            String   @id @default(cuid())
-  createdAt     DateTime @default(now())
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
   businessId    String
-  business      Business @relation(fields: [businessId], references: [id])
+  business      Business       @relation(fields: [businessId], references: [id])
   requestedById String
-  requestedBy   User     @relation(fields: [requestedById], references: [id])
-  status        String   @default("pending")
+  requestedBy   User           @relation(fields: [requestedById], references: [id])
+  status        String         @default("pending")
   note          String?
   items         PreorderItem[]
 }
 
 model PreorderItem {
-  id         String  @id @default(cuid())
+  id         String   @id @default(cuid())
   preorderId String
   preorder   Preorder @relation(fields: [preorderId], references: [id])
   productId  String
@@ -114,16 +114,16 @@ model PreorderItem {
 }
 
 model Application {
-  id              String   @id @default(cuid())
-  createdAt       DateTime @default(now())
-  inGameFullName  String
-  contact         String
-  phone           String?
-  stateId         String?
-  region          String
-  about           String
-  moreThan5Hours  Boolean
-  status          String   @default("new")
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  inGameFullName String
+  contact        String
+  phone          String?
+  stateId        String?
+  region         String
+  about          String
+  moreThan5Hours Boolean
+  status         String   @default("new")
 }
 
 model Settings {
