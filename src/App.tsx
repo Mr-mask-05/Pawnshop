@@ -1,4 +1,3 @@
-// src/App.tsx  (PART A/2)
 import React, { useEffect, useState } from "react";
 
 /**
@@ -32,8 +31,9 @@ function nextId(prefix = "id"): string {
   const ts = Date.now().toString(36);
   __idCounter = (__idCounter + 1) % 1_000_000_000;
   try {
-    if (typeof window !== "undefined")
+    if (typeof window !== "undefined") {
       window.localStorage.setItem("__app_id_counter", String(__idCounter));
+    }
   } catch {}
   return `${prefix}_${ts}_${__idCounter.toString(36)}`;
 }
@@ -539,8 +539,6 @@ export default function App() {
     </div>
   );
 }
-// src/App.tsx  (PART B/2 — append after PART A/2)
-
 /* ================== Screens ================== */
 function Catalog({
   products,
@@ -607,8 +605,17 @@ function LoginPage({
             setErr(onLogin(u, p));
           }}
         >
-          <TextInput label="Username" value={u} onChange={(e) => setU(e.target.value)} />
-          <TextInput label="Password" type="password" value={p} onChange={(e) => setP(e.target.value)} />
+          <TextInput
+            label="Username"
+            value={u}
+            onChange={(e) => setU(e.target.value)}
+          />
+          <TextInput
+            label="Password"
+            type="password"
+            value={p}
+            onChange={(e) => setP(e.target.value)}
+          />
           {err && <div className="mt-2 text-sm text-red-500">{err}</div>}
           <div className="mt-3 flex items-center justify-between">
             <Button type="submit">Login</Button>
@@ -650,7 +657,9 @@ function BusinessPortal({
     setCart((prev) => {
       const ex = prev.find((l) => l.productId === pid);
       return ex
-        ? prev.map((l) => (l.productId === pid ? { ...l, qty: l.qty + qty } : l))
+        ? prev.map((l) =>
+            l.productId === pid ? { ...l, qty: l.qty + qty } : l
+          )
         : [...prev, { productId: pid, qty }];
     });
   }
@@ -663,9 +672,17 @@ function BusinessPortal({
         <h3 className="mb-3 text-lg font-semibold">Inventory</h3>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {products.map((p) => (
-            <div key={p.id} className="flex items-center justify-between rounded-xl border border-gray-200 p-3 dark:border-neutral-800">
+            <div
+              key={p.id}
+              className="flex items-center justify-between rounded-xl border border-gray-200 p-3 dark:border-neutral-800"
+            >
               <div className="flex items-center gap-3">
-                {p.image && <img src={p.image} className="h-14 w-14 rounded-lg object-cover" />}
+                {p.image && (
+                  <img
+                    src={p.image}
+                    className="h-14 w-14 rounded-lg object-cover"
+                  />
+                )}
                 <div>
                   <div className="font-semibold">{p.name}</div>
                   <div className="text-sm text-gray-600 dark:text-neutral-400">
@@ -688,10 +705,15 @@ function BusinessPortal({
             {cart.map((l) => {
               const p = products.find((pp) => pp.id === l.productId)!;
               return (
-                <div key={l.productId} className="flex items-center justify-between rounded-xl border border-gray-200 p-3 dark:border-neutral-800">
+                <div
+                  key={l.productId}
+                  className="flex items-center justify-between rounded-xl border border-gray-200 p-3 dark:border-neutral-800"
+                >
                   <div>
                     <div className="font-medium">{p.name}</div>
-                    <div className="text-sm text-gray-600 dark:text-neutral-400">{money(linePrice(p.id))} each</div>
+                    <div className="text-sm text-gray-600 dark:text-neutral-400">
+                      {money(linePrice(p.id))} each
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <input
@@ -703,20 +725,30 @@ function BusinessPortal({
                         setCart((prev) =>
                           prev.map((x) =>
                             x.productId === l.productId
-                              ? { ...x, qty: Math.max(1, Math.min(Number(e.target.value) || 1, p.stock)) }
+                              ? {
+                                  ...x,
+                                  qty: Math.max(
+                                    1,
+                                    Math.min(Number(e.target.value) || 1, p.stock)
+                                  ),
+                                }
                               : x
                           )
                         )
                       }
                       className="w-20 rounded-xl border border-gray-300 px-2 py-1 dark:border-neutral-700 dark:bg-neutral-900"
                     />
-                    <div className="w-28 text-right font-semibold">{money(linePrice(p.id) * l.qty)}</div>
+                    <div className="w-28 text-right font-semibold">
+                      {money(linePrice(p.id) * l.qty)}
+                    </div>
                   </div>
                 </div>
               );
             })}
             <div className="flex items-center justify-between border-t pt-3 dark:border-neutral-800">
-              <div className="text-sm text-gray-600 dark:text-neutral-400">Total</div>
+              <div className="text-sm text-gray-600 dark:text-neutral-400">
+                Total
+              </div>
               <div className="text-lg font-bold">{money(total)}</div>
             </div>
             <PlaceOrderBar
@@ -737,13 +769,23 @@ function BusinessPortal({
         ) : (
           <div className="space-y-3">
             {orders.map((o) => (
-              <div key={o.id} className="rounded-2xl border border-gray-200 p-3 dark:border-neutral-800">
+              <div
+                key={o.id}
+                className="rounded-2xl border border-gray-200 p-3 dark:border-neutral-800"
+              >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="font-medium">Order #{o.id}</div>
-                  <div className="text-sm text-gray-600">{new Date(o.createdAt).toLocaleString()}</div>
+                  <div className="text-sm text-gray-600">
+                    {new Date(o.createdAt).toLocaleString()}
+                  </div>
                 </div>
                 <div className="text-sm text-gray-600 dark:text-neutral-400">
-                  Status: <b>{prettyStatus(o.status)}</b> • {o.delivery === "pickup" ? (o.pickupCode ? `Pickup code: ${o.pickupCode}` : "Pickup") : "Delivery"}
+                  Status: <b>{prettyStatus(o.status)}</b> •{" "}
+                  {o.delivery === "pickup"
+                    ? o.pickupCode
+                      ? `Pickup code: ${o.pickupCode}`
+                      : "Pickup"
+                    : "Delivery"}
                 </div>
                 <div className="mt-1 font-semibold">{money(o.total)}</div>
               </div>
@@ -823,27 +865,42 @@ function StaffSite({
       <AccountPanel username={session.username} onUpdate={onUpdateAccount} />
       <div className="flex flex-wrap gap-2">
         {show.products && (
-          <Button variant={tab === "products" ? "primary" : "ghost"} onClick={() => setTab("products")}>
+          <Button
+            variant={tab === "products" ? "primary" : "ghost"}
+            onClick={() => setTab("products")}
+          >
             Products
           </Button>
         )}
         {show.orders && (
-          <Button variant={tab === "orders" ? "primary" : "ghost"} onClick={() => setTab("orders")}>
+          <Button
+            variant={tab === "orders" ? "primary" : "ghost"}
+            onClick={() => setTab("orders")}
+          >
             Orders
           </Button>
         )}
         {show.applications && (
-          <Button variant={tab === "applications" ? "primary" : "ghost"} onClick={() => setTab("applications")}>
+          <Button
+            variant={tab === "applications" ? "primary" : "ghost"}
+            onClick={() => setTab("applications")}
+          >
             Applications
           </Button>
         )}
         {show.business && (
-          <Button variant={tab === "business" ? "primary" : "ghost"} onClick={() => setTab("business")}>
+          <Button
+            variant={tab === "business" ? "primary" : "ghost"}
+            onClick={() => setTab("business")}
+          >
             Businesses
           </Button>
         )}
         {show.settings && (
-          <Button variant={tab === "settings" ? "primary" : "ghost"} onClick={() => setTab("settings")}>
+          <Button
+            variant={tab === "settings" ? "primary" : "ghost"}
+            onClick={() => setTab("settings")}
+          >
             Settings
           </Button>
         )}
@@ -870,7 +927,11 @@ function StaffSite({
       )}
 
       {tab === "applications" && (
-        <ApplicationsTab apps={applications} onSetStatus={onSetAppStatus} canReview={can.reviewApps} />
+        <ApplicationsTab
+          apps={applications}
+          onSetStatus={onSetAppStatus}
+          canReview={can.reviewApps}
+        />
       )}
 
       {tab === "business" && can.manageBiz && (
@@ -933,32 +994,78 @@ function ProductsTab({
         <h3 className="mb-3 text-lg font-semibold">Add / Edit Product</h3>
         {canEdit ? (
           <div className="space-y-3">
-            <TextInput label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <TextArea label="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-            <TextInput label="Image URL" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+            <TextInput
+              label="Name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+            <TextArea
+              label="Description"
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+            />
+            <TextInput
+              label="Image URL"
+              value={form.image}
+              onChange={(e) => setForm({ ...form, image: e.target.value })}
+            />
             <label className="block">
               <span className="mb-1 block text-sm font-medium">Card Size</span>
               <select
                 className="w-full rounded-xl border px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900"
                 value={form.cardSize}
-                onChange={(e) => setForm({ ...form, cardSize: e.target.value as Product["cardSize"] })}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    cardSize: e.target.value as Product["cardSize"],
+                  })
+                }
               >
                 <option value="sm">Small</option>
                 <option value="md">Medium</option>
                 <option value="lg">Large</option>
               </select>
             </label>
-            <TextInput label="Public Price (SEK)" type="number" value={form.publicPrice} onChange={(e) => setForm({ ...form, publicPrice: Number(e.target.value) })} />
-            <TextInput label="Business Price (SEK)" type="number" value={form.businessPrice} onChange={(e) => setForm({ ...form, businessPrice: Number(e.target.value) })} />
-            <TextInput label="Stock" type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })} />
+            <TextInput
+              label="Public Price (SEK)"
+              type="number"
+              value={form.publicPrice}
+              onChange={(e) =>
+                setForm({ ...form, publicPrice: Number(e.target.value) })
+              }
+            />
+            <TextInput
+              label="Business Price (SEK)"
+              type="number"
+              value={form.businessPrice}
+              onChange={(e) =>
+                setForm({ ...form, businessPrice: Number(e.target.value) })
+              }
+            />
+            <TextInput
+              label="Stock"
+              type="number"
+              value={form.stock}
+              onChange={(e) =>
+                setForm({ ...form, stock: Number(e.target.value) })
+              }
+            />
             <div className="flex items-center gap-2">
               <Button onClick={submit}>{form.id ? "Update" : "Create"}</Button>
-              {form.id && <Button variant="ghost" onClick={() => setForm(empty)}>Cancel</Button>}
+              {form.id && (
+                <Button variant="ghost" onClick={() => setForm(empty)}>
+                  Cancel
+                </Button>
+              )}
             </div>
-            {form.id && <div className="text-xs text-gray-500">Editing: {form.id}</div>}
+            {form.id && (
+              <div className="text-xs text-gray-500">Editing: {form.id}</div>
+            )}
           </div>
         ) : (
-          <div className="text-sm text-gray-500">Read-only: your role cannot create or edit products.</div>
+          <div className="text-sm text-gray-500">
+            Read-only: your role cannot create or edit products.
+          </div>
         )}
       </Card>
       <Card className="lg:col-span-2">
@@ -982,8 +1089,16 @@ function ProductsTab({
               <div className="col-span-2">{money(p.businessPrice)}</div>
               <div className="col-span-1">{p.stock}</div>
               <div className="col-span-3 flex items-center justify-end gap-2">
-                {canEdit && <Button variant="ghost" onClick={() => setForm(p)}>Edit</Button>}
-                {canDelete && <Button variant="danger" onClick={() => onDelete(p.id)}>Delete</Button>}
+                {canEdit && (
+                  <Button variant="ghost" onClick={() => setForm(p)}>
+                    Edit
+                  </Button>
+                )}
+                {canDelete && (
+                  <Button variant="danger" onClick={() => onDelete(p.id)}>
+                    Delete
+                  </Button>
+                )}
               </div>
             </div>
           ))}
@@ -1015,16 +1130,26 @@ function OrdersTab({
       ) : (
         <div className="space-y-3">
           {orders.map((o) => (
-            <div key={o.id} className="rounded-2xl border border-gray-200 p-3 dark:border-neutral-800">
+            <div
+              key={o.id}
+              className="rounded-2xl border border-gray-200 p-3 dark:border-neutral-800"
+            >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="font-medium">Order #{o.id} • Business: {o.businessId} • By: {o.placedBy}</div>
-                <div className="text-sm text-gray-600">{new Date(o.createdAt).toLocaleString()}</div>
+                <div className="font-medium">
+                  Order #{o.id} • Business: {o.businessId} • By: {o.placedBy}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {new Date(o.createdAt).toLocaleString()}
+                </div>
               </div>
               <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
                 <div className="space-y-1 text-sm">
                   {o.items.map((it, i) => (
                     <div key={i} className="flex items-center justify-between">
-                      <span>{nameFor(it.productId)} <span className="text-gray-500">× {it.qty}</span></span>
+                      <span>
+                        {nameFor(it.productId)}{" "}
+                        <span className="text-gray-500">× {it.qty}</span>
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -1037,7 +1162,9 @@ function OrdersTab({
                     <select
                       className="rounded-xl border px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-900"
                       value={o.status}
-                      onChange={(e) => onSetStatus(o.id, e.target.value as FulfillmentStatus)}
+                      onChange={(e) =>
+                        onSetStatus(o.id, e.target.value as FulfillmentStatus)
+                      }
                       disabled={!canManage}
                     >
                       <option value="placed">Placed</option>
@@ -1052,7 +1179,9 @@ function OrdersTab({
                       <input
                         type="checkbox"
                         checked={o.invoice.paid}
-                        onChange={(e) => onSetInvoicePaid(o.id, e.target.checked)}
+                        onChange={(e) =>
+                          onSetInvoicePaid(o.id, e.target.checked)
+                        }
                         disabled={!canManage}
                       />
                       Paid
@@ -1089,28 +1218,41 @@ function ApplicationsTab({
     (a) =>
       (status === "all" || a.status === status) &&
       (region === "all" || a.region === region) &&
-      (hours === "all" || (hours === "yes" ? a.moreThan5Hours : !a.moreThan5Hours))
+      (hours === "all" ||
+        (hours === "yes" ? a.moreThan5Hours : !a.moreThan5Hours))
   );
   return (
     <Card>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-lg font-semibold">Job Applications</h3>
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <select className="rounded-xl border px-2 py-1 dark:border-neutral-700 dark:bg-neutral-900" value={status} onChange={(e) => setStatus(e.target.value as any)}>
+          <select
+            className="rounded-xl border px-2 py-1 dark:border-neutral-700 dark:bg-neutral-900"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as any)}
+          >
             <option value="all">All</option>
             <option value="new">New</option>
             <option value="reviewed">Reviewed</option>
             <option value="accepted">Accepted</option>
             <option value="rejected">Rejected</option>
           </select>
-          <select className="rounded-xl border px-2 py-1 dark:border-neutral-700 dark:bg-neutral-900" value={region} onChange={(e) => setRegion(e.target.value as any)}>
+          <select
+            className="rounded-xl border px-2 py-1 dark:border-neutral-700 dark:bg-neutral-900"
+            value={region}
+            onChange={(e) => setRegion(e.target.value as any)}
+          >
             <option value="all">Any Region</option>
             <option value="AU">AU</option>
             <option value="EU">EU</option>
             <option value="NA">NA</option>
             <option value="Other">Other</option>
           </select>
-          <select className="rounded-xl border px-2 py-1 dark:border-neutral-700 dark:bg-neutral-900" value={hours} onChange={(e) => setHours(e.target.value as any)}>
+          <select
+            className="rounded-xl border px-2 py-1 dark:border-neutral-700 dark:bg-neutral-900"
+            value={hours}
+            onChange={(e) => setHours(e.target.value as any)}
+          >
             <option value="all">Any Hours</option>
             <option value="yes">&gt; 5h/week</option>
             <option value="no">≤ 5h/week</option>
@@ -1118,17 +1260,26 @@ function ApplicationsTab({
         </div>
       </div>
       {list.length === 0 ? (
-        <div className="text-sm text-gray-500">No applications match the filters.</div>
+        <div className="text-sm text-gray-500">
+          No applications match the filters.
+        </div>
       ) : (
         <div className="space-y-3">
           {list.map((a) => (
-            <div key={a.id} className="rounded-2xl border border-gray-200 p-3 dark:border-neutral-800">
+            <div
+              key={a.id}
+              className="rounded-2xl border border-gray-200 p-3 dark:border-neutral-800"
+            >
               <div className="flex items-center justify-between">
                 <div className="font-medium">{a.inGameFullName}</div>
-                <div className="text-sm text-gray-600">{new Date(a.date).toLocaleString()}</div>
+                <div className="text-sm text-gray-600">
+                  {new Date(a.date).toLocaleString()}
+                </div>
               </div>
               <div className="mt-2 text-sm text-gray-700 dark:text-neutral-200">
-                Contact: {a.discordOrEmail} • State ID: {a.stateId || "—"} • Region: {a.region} • &gt;5h/wk: {a.moreThan5Hours ? "Yes" : "No"}
+                Contact: {a.discordOrEmail} • State ID: {a.stateId || "—"} •
+                Region: {a.region} • &gt;5h/wk:{" "}
+                {a.moreThan5Hours ? "Yes" : "No"}
               </div>
               <div className="mt-2 whitespace-pre-wrap">{a.about}</div>
               <div className="mt-3 flex items-center justify-between">
@@ -1136,7 +1287,9 @@ function ApplicationsTab({
                 <select
                   className="rounded-xl border px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-900"
                   value={a.status}
-                  onChange={(e) => onSetStatus(a.id, e.target.value as Application["status"])}
+                  onChange={(e) =>
+                    onSetStatus(a.id, e.target.value as Application["status"])
+                  }
                   disabled={!canReview}
                 >
                   <option value="new">New</option>
@@ -1198,11 +1351,26 @@ function BusinessTab({
       <Card>
         <h3 className="mb-3 text-lg font-semibold">Businesses</h3>
         <div className="space-y-3">
-          <TextInput label="Name" value={bForm.name} onChange={(e) => setBForm({ ...bForm, name: e.target.value })} />
-          <TextInput label="Discount %" type="number" value={bForm.discountPct} onChange={(e) => setBForm({ ...bForm, discountPct: Number(e.target.value) })} />
+          <TextInput
+            label="Name"
+            value={bForm.name}
+            onChange={(e) => setBForm({ ...bForm, name: e.target.value })}
+          />
+          <TextInput
+            label="Discount %"
+            type="number"
+            value={bForm.discountPct}
+            onChange={(e) =>
+              setBForm({ ...bForm, discountPct: Number(e.target.value) })
+            }
+          />
           <div className="flex items-center gap-2">
             <Button onClick={saveBiz}>{bForm.id ? "Update" : "Create"}</Button>
-            {bForm.id && <Button variant="ghost" onClick={() => setBForm(emptyBiz)}>Cancel</Button>}
+            {bForm.id && (
+              <Button variant="ghost" onClick={() => setBForm(emptyBiz)}>
+                Cancel
+              </Button>
+            )}
           </div>
         </div>
         <div className="mt-4 divide-y rounded-2xl border border-gray-200 dark:divide-neutral-800 dark:border-neutral-800">
@@ -1210,12 +1378,21 @@ function BusinessTab({
             <div key={b.id} className="flex items-center justify-between p-3">
               <div>
                 <div className="font-medium">{b.name}</div>
-                <div className="text-sm text-gray-600">Discount: {b.discountPct}%</div>
+                <div className="text-sm text-gray-600">
+                  Discount: {b.discountPct}%
+                </div>
                 <div className="text-[10px] text-gray-400">{b.id}</div>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" onClick={() => setBForm(b)}>Edit</Button>
-                <Button variant="danger" onClick={() => onDeleteBusiness(b.id)}>Delete</Button>
+                <Button variant="ghost" onClick={() => setBForm(b)}>
+                  Edit
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => onDeleteBusiness(b.id)}
+                >
+                  Delete
+                </Button>
               </div>
             </div>
           ))}
@@ -1224,12 +1401,33 @@ function BusinessTab({
       <Card>
         <h3 className="mb-3 text-lg font-semibold">Business Users</h3>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <TextInput label="Username" value={uForm.username} onChange={(e) => setUForm({ ...uForm, username: e.target.value })} />
-          <TextInput label="Password" type="password" value={uForm.password} onChange={(e) => setUForm({ ...uForm, password: e.target.value })} />
-          <TextInput label="Display Name" value={uForm.displayName} onChange={(e) => setUForm({ ...uForm, displayName: e.target.value })} />
+          <TextInput
+            label="Username"
+            value={uForm.username}
+            onChange={(e) => setUForm({ ...uForm, username: e.target.value })}
+          />
+          <TextInput
+            label="Password"
+            type="password"
+            value={uForm.password}
+            onChange={(e) => setUForm({ ...uForm, password: e.target.value })}
+          />
+          <TextInput
+            label="Display Name"
+            value={uForm.displayName}
+            onChange={(e) =>
+              setUForm({ ...uForm, displayName: e.target.value })
+            }
+          />
           <label className="block">
             <span className="mb-1 block text-sm font-medium">Role</span>
-            <select className="w-full rounded-xl border px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900" value={uForm.role} onChange={(e) => setUForm({ ...uForm, role: e.target.value as BizRole })}>
+            <select
+              className="w-full rounded-xl border px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900"
+              value={uForm.role}
+              onChange={(e) =>
+                setUForm({ ...uForm, role: e.target.value as BizRole })
+              }
+            >
               <option value="owner">Owner</option>
               <option value="manager">Manager</option>
               <option value="employee">Employee</option>
@@ -1237,7 +1435,13 @@ function BusinessTab({
           </label>
           <label className="block md:col-span-2">
             <span className="mb-1 block text-sm font-medium">Business</span>
-            <select className="w-full rounded-xl border px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900" value={uForm.businessId} onChange={(e) => setUForm({ ...uForm, businessId: e.target.value })}>
+            <select
+              className="w-full rounded-xl border px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900"
+              value={uForm.businessId}
+              onChange={(e) =>
+                setUForm({ ...uForm, businessId: e.target.value })
+              }
+            >
               <option value="">Select…</option>
               {businesses.map((b) => (
                 <option key={b.id} value={b.id}>
@@ -1247,8 +1451,16 @@ function BusinessTab({
             </select>
           </label>
           <div className="md:col-span-2 flex items-center gap-2">
-            <Button onClick={saveUser}>{users.some((u) => u.username === uForm.username) ? "Update" : "Create"}</Button>
-            {uForm.username && <Button variant="ghost" onClick={() => setUForm(emptyUser)}>Cancel</Button>}
+            <Button onClick={saveUser}>
+              {users.some((u) => u.username === uForm.username)
+                ? "Update"
+                : "Create"}
+            </Button>
+            {uForm.username && (
+              <Button variant="ghost" onClick={() => setUForm(emptyUser)}>
+                Cancel
+              </Button>
+            )}
           </div>
         </div>
         <div className="mt-4 divide-y rounded-2xl border border-gray-200 dark:divide-neutral-800 dark:border-neutral-800">
@@ -1264,10 +1476,17 @@ function BusinessTab({
               <div className="col-span-3">{u.username}</div>
               <div className="col-span-3">{u.displayName}</div>
               <div className="col-span-2">{u.role}</div>
-              <div className="col-span-3">{businesses.find((b) => b.id === u.businessId)?.name || u.businessId}</div>
+              <div className="col-span-3">
+                {businesses.find((b) => b.id === u.businessId)?.name ||
+                  u.businessId}
+              </div>
               <div className="col-span-1 flex items-center justify-end gap-2">
-                <Button variant="ghost" onClick={() => setUForm(u)}>Edit</Button>
-                <Button variant="danger" onClick={() => onDeleteUser(u.username)}>Delete</Button>
+                <Button variant="ghost" onClick={() => setUForm(u)}>
+                  Edit
+                </Button>
+                <Button variant="danger" onClick={() => onDeleteUser(u.username)}>
+                  Delete
+                </Button>
               </div>
             </div>
           ))}
@@ -1277,25 +1496,45 @@ function BusinessTab({
   );
 }
 
-function SettingsTab({ bgUrl, onSetBgUrl }: { bgUrl?: string; onSetBgUrl: (u: string) => void }) {
+function SettingsTab({
+  bgUrl,
+  onSetBgUrl,
+}: {
+  bgUrl?: string;
+  onSetBgUrl: (u: string) => void;
+}) {
   return (
     <Card>
       <h3 className="mb-3 text-lg font-semibold">Settings</h3>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="md:col-span-2">
-          <TextInput label="Catalog Background Image URL" value={bgUrl || ""} onChange={(e) => onSetBgUrl(e.target.value)} />
+          <TextInput
+            label="Catalog Background Image URL"
+            value={bgUrl || ""}
+            onChange={(e) => onSetBgUrl(e.target.value)}
+          />
         </div>
         <div className="flex items-end">
-          <Button variant="ghost" onClick={() => onSetBgUrl("")}>Clear</Button>
+          <Button variant="ghost" onClick={() => onSetBgUrl("")}>
+            Clear
+          </Button>
         </div>
       </div>
-      <p className="mt-3 text-xs text-gray-500">This demo stores data in localStorage. Swap to a backend for production.</p>
+      <p className="mt-3 text-xs text-gray-500">
+        This demo stores data in localStorage. Swap to a backend for production.
+      </p>
     </Card>
   );
 }
 
 /* ================== Widgets ================== */
-function AccountPanel({ username, onUpdate }: { username: string; onUpdate: (p: { email?: string; password?: string }) => string | null }) {
+function AccountPanel({
+  username,
+  onUpdate,
+}: {
+  username: string;
+  onUpdate: (p: { email?: string; password?: string }) => string | null;
+}) {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
@@ -1308,12 +1547,25 @@ function AccountPanel({ username, onUpdate }: { username: string; onUpdate: (p: 
         </div>
       </div>
       <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
-        <TextInput label="Email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
-        <TextInput label="New Password" type="password" value={pw} onChange={(e) => setPw(e.target.value)} />
+        <TextInput
+          label="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+        />
+        <TextInput
+          label="New Password"
+          type="password"
+          value={pw}
+          onChange={(e) => setPw(e.target.value)}
+        />
         <div className="flex items-end">
           <Button
             onClick={() => {
-              const err = onUpdate({ email: email || undefined, password: pw || undefined });
+              const err = onUpdate({
+                email: email || undefined,
+                password: pw || undefined,
+              });
               setMsg(err || "Saved!");
               setPw("");
             }}
@@ -1322,12 +1574,22 @@ function AccountPanel({ username, onUpdate }: { username: string; onUpdate: (p: 
           </Button>
         </div>
       </div>
-      {msg && <div className="mt-2 text-sm text-gray-600 dark:text-neutral-400">{msg}</div>}
+      {msg && (
+        <div className="mt-2 text-sm text-gray-600 dark:text-neutral-400">
+          {msg}
+        </div>
+      )}
     </Card>
   );
 }
 
-function AddToCart({ max, onAdd }: { max: number; onAdd: (q: number) => void }) {
+function AddToCart({
+  max,
+  onAdd,
+}: {
+  max: number;
+  onAdd: (q: number) => void;
+}) {
   const [qty, setQty] = useState(1);
   return (
     <div className="flex items-center gap-2">
@@ -1336,10 +1598,14 @@ function AddToCart({ max, onAdd }: { max: number; onAdd: (q: number) => void }) 
         min={1}
         max={max}
         value={Math.min(qty, max)}
-        onChange={(e) => setQty(Math.max(1, Math.min(Number(e.target.value) || 1, max)))}
+        onChange={(e) =>
+          setQty(Math.max(1, Math.min(Number(e.target.value) || 1, max)))
+        }
         className="w-20 rounded-xl border border-gray-300 px-2 py-1 dark:border-neutral-700 dark:bg-neutral-900"
       />
-      <Button onClick={() => onAdd(qty)} disabled={max <= 0}>Add</Button>
+      <Button onClick={() => onAdd(qty)} disabled={max <= 0}>
+        Add
+      </Button>
     </div>
   );
 }
@@ -1349,23 +1615,41 @@ function PlaceOrderBar({ onPlace }: { onPlace: (opt: DeliveryOption) => void }) 
   return (
     <div className="flex flex-wrap items-center justify-end gap-3">
       <label className="inline-flex items-center gap-1 text-sm">
-        <input type="radio" checked={opt === "pickup"} onChange={() => setOpt("pickup")} /> Pickup
+        <input
+          type="radio"
+          checked={opt === "pickup"}
+          onChange={() => setOpt("pickup")}
+        />{" "}
+        Pickup
       </label>
       <label className="inline-flex items-center gap-1 text-sm">
-        <input type="radio" checked={opt === "delivery"} onChange={() => setOpt("delivery")} /> Delivery
+        <input
+          type="radio"
+          checked={opt === "delivery"}
+          onChange={() => setOpt("delivery")}
+        />{" "}
+        Delivery
       </label>
       <Button onClick={() => onPlace(opt)}>Place Order</Button>
     </div>
   );
 }
 
-function Hero({ bgUrl, children }: { bgUrl?: string; children: React.ReactNode }) {
+function Hero({
+  bgUrl,
+  children,
+}: {
+  bgUrl?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="relative mb-6 overflow-hidden rounded-2xl border border-gray-200 dark:border-neutral-800">
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: bgUrl ? `url(${bgUrl})` : "linear-gradient(135deg,#111,#333)",
+          backgroundImage: bgUrl
+            ? `url(${bgUrl})`
+            : "linear-gradient(135deg,#111,#333)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           filter: "saturate(1.05)",
@@ -1374,7 +1658,7 @@ function Hero({ bgUrl, children }: { bgUrl?: string; children: React.ReactNode }
       />
       <div className="absolute inset-0 bg-black/40" />
       <div className="relative z-10 p-6 text-white">{children}</div>
-      <style>{"@keyframes panZoom{0%{transform:scale(1)}100%{transform:scale(1.08)}}"}</style>
+      <style>{`@keyframes panZoom{0%{transform:scale(1)}100%{transform:scale(1.08)}}`}</style>
     </div>
   );
 }
@@ -1401,7 +1685,11 @@ function prettyStatus(s: FulfillmentStatus) {
 }
 
 /* ================== Apply Page ================== */
-function ApplyPage({ onSubmit }: { onSubmit: (a: Omit<Application, "id" | "date" | "status">) => void }) {
+function ApplyPage({
+  onSubmit,
+}: {
+  onSubmit: (a: Omit<Application, "id" | "date" | "status">) => void;
+}) {
   const [inGameFullName, setInGameFullName] = useState("");
   const [discordOrEmail, setDiscordOrEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -1413,10 +1701,23 @@ function ApplyPage({ onSubmit }: { onSubmit: (a: Omit<Application, "id" | "date"
 
   function submit() {
     if (!inGameFullName || !discordOrEmail || !about) return;
-    onSubmit({ inGameFullName, discordOrEmail, phone: phone || undefined, stateId: stateId || undefined, region, about, moreThan5Hours });
+    onSubmit({
+      inGameFullName,
+      discordOrEmail,
+      phone: phone || undefined,
+      stateId: stateId || undefined,
+      region,
+      about,
+      moreThan5Hours,
+    });
     setDone(true);
-    setInGameFullName(""); setDiscordOrEmail(""); setPhone(""); setStateId("");
-    setRegion("EU"); setMoreThan5Hours(false); setAbout("");
+    setInGameFullName("");
+    setDiscordOrEmail("");
+    setPhone("");
+    setStateId("");
+    setRegion("EU");
+    setMoreThan5Hours(false);
+    setAbout("");
   }
 
   return (
@@ -1429,13 +1730,37 @@ function ApplyPage({ onSubmit }: { onSubmit: (a: Omit<Application, "id" | "date"
       )}
       <Card>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <TextInput label="In-game Full Name" value={inGameFullName} onChange={(e) => setInGameFullName(e.target.value)} />
-          <TextInput label="Discord or Email" value={discordOrEmail} onChange={(e) => setDiscordOrEmail(e.target.value)} />
-          <TextInput label="Phone (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} />
-          <TextInput label="State ID (optional)" value={stateId} onChange={(e) => setStateId(e.target.value)} />
+          <TextInput
+            label="In-game Full Name"
+            value={inGameFullName}
+            onChange={(e) => setInGameFullName(e.target.value)}
+          />
+          <TextInput
+            label="Discord or Email"
+            value={discordOrEmail}
+            onChange={(e) => setDiscordOrEmail(e.target.value)}
+          />
+          <TextInput
+            label="Phone (optional)"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+          <TextInput
+            label="State ID (optional)"
+            value={stateId}
+            onChange={(e) => setStateId(e.target.value)}
+          />
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">Region</span>
-            <select className="w-full rounded-xl border border-gray-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900" value={region} onChange={(e) => setRegion(e.target.value as Application["region"]) }>
+            <span className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
+              Region
+            </span>
+            <select
+              className="w-full rounded-xl border border-gray-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900"
+              value={region}
+              onChange={(e) =>
+                setRegion(e.target.value as Application["region"])
+              }
+            >
               <option value="AU">AU</option>
               <option value="EU">EU</option>
               <option value="NA">NA</option>
@@ -1443,13 +1768,24 @@ function ApplyPage({ onSubmit }: { onSubmit: (a: Omit<Application, "id" | "date"
             </select>
           </label>
           <label className="md:col-span-2 inline-flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={moreThan5Hours} onChange={(e) => setMoreThan5Hours(e.target.checked)} />
+            <input
+              type="checkbox"
+              checked={moreThan5Hours}
+              onChange={(e) => setMoreThan5Hours(e.target.checked)}
+            />
             Will you work more than 5 hours per week?
           </label>
           <div className="md:col-span-2">
-            <TextArea label="Why should you work here? Tell us about you" rows={6} value={about} onChange={(e) => setAbout(e.target.value)} />
+            <TextArea
+              label="Why should you work here? Tell us about you"
+              rows={6}
+              value={about}
+              onChange={(e) => setAbout(e.target.value)}
+            />
           </div>
-          <div className="md:col-span-2 flex items-center justify-end"><Button onClick={submit}>Submit</Button></div>
+          <div className="md:col-span-2 flex items-center justify-end">
+            <Button onClick={submit}>Submit</Button>
+          </div>
         </div>
       </Card>
     </div>
