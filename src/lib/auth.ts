@@ -54,4 +54,11 @@ export const authConfig: NextAuthConfig = {
       (session as any).businessId = token.businessId;
       (session as any).username = token.username;
       (session as any).mustChangePassword = token.mustChangePassword;
-      (session as any).mustAddStateId =
+      (session as any).mustAddStateId = token.mustAddStateId;
+      (session as any).stateId = token.stateId;
+      return session;
+    }
+  }
+};
+
+export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
