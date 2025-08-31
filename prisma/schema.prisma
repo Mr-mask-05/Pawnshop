@@ -1,8 +1,26 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+generator client {
+  provider = "prisma-client-js"
+}
 
-enum StaffRole { owner hr manager inventory orders viewer }
-enum BizRole { owner manager employee }
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum StaffRole {
+  owner
+  hr
+  manager
+  inventory
+  orders
+  viewer
+}
+
+enum BizRole {
+  owner
+  manager
+  employee
+}
 
 model User {
   id                 String   @id @default(cuid())
