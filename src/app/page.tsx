@@ -1,3 +1,4 @@
+"use client";
 // src/App.tsx  (PART A/2)
 import React, { useEffect, useState } from "react";
 
@@ -230,7 +231,7 @@ function Badge({ children }: { children: React.ReactNode }) {
 }
 
 /* ================== Root App ================== */
-export default function App() {
+export default function Home() {
   const [dark, setDark] = useState(load(LS.theme, true));
   useEffect(() => save(LS.theme, dark), [dark]);
 
