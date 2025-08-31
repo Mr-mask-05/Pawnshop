@@ -1,10 +1,15 @@
 import React from 'react';
 import TopBar from '../../components/TopBar';
+import { auth } from '../../lib/auth';
 
-export default function PortalLayout({ children }: { children: React.ReactNode }) {
-  // Placeholder values; in real app these would come from auth/session
-  const username = 'Demo User';
-  const stateId = 'STATE-12345';
+export default async function PortalLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth();
+  const username = (session as any)?.username ?? session?.user?.name ?? null;
+  const stateId = (session as any)?.stateId ?? null;
 
   return (
     <div>
