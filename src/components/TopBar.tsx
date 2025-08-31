@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import React from 'react';
+import { signOut } from 'next-auth/react';
 
 interface TopBarProps {
   username?: string | null;
@@ -16,10 +17,13 @@ export default function TopBar({ username, stateId }: TopBarProps) {
     <header className="flex items-center justify-between border-b p-4">
       <div className="font-semibold">{displayName}</div>
       <div className="text-sm text-gray-600">State ID: {displayStateId}</div>
-      <div>
+      <div className="flex items-center gap-4">
         <Link href="/account" className="underline">
           Account Settings
         </Link>
+        <button onClick={() => signOut()} className="underline">
+          Sign out
+        </button>
       </div>
     </header>
   );
