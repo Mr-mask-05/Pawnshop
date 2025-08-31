@@ -38,6 +38,9 @@ model User {
   businessId         String?
   business           Business? @relation(fields: [businessId], references: [id])
   emailVerified      DateTime?
+  // Back-relations
+  ordersPlaced       Order[]
+  preordersRequested Preorder[]
 }
 
 model Business {
