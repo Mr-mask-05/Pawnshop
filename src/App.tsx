@@ -78,6 +78,7 @@ const LS_KEYS = {
   adminUser: "pawn_admin_user",
   session: "pawn_session",
   theme: "pawn_theme",
+  backgroundUrl: "pawn_background_url",
 };
 
 function load<T>(key: string, fallback: T): T {
@@ -185,10 +186,8 @@ function Button(
   const base =
     "inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-semibold transition focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed";
   const styles = {
-    primary:
-      "bg-black text-white hover:bg-gray-900 shadow dark:bg-white dark:text-black dark:hover:bg-neutral-200",
-    ghost:
-      "bg-transparent text-gray-800 hover:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-800",
+    primary: "bg-black text-white hover:bg-gray-900 shadow dark:bg-white dark:text-black dark:hover:bg-neutral-200",
+    ghost: "bg-transparent text-gray-800 hover:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-800",
     danger: "bg-red-600 text-white hover:bg-red-700",
   } as const;
   return <button className={`${base} ${styles[variant]} ${className}`} {...rest} />;
@@ -218,6 +217,10 @@ export default function PawnshopPortalApp() {
   // Theme
   const [dark, setDark] = useState<boolean>(load<boolean>(LS_KEYS.theme, true));
   useEffect(() => save(LS_KEYS.theme, dark), [dark]);
+
+  // Background image (animated hero)
+  const [bgUrl, setBgUrl] = useState<string>(load<string>(LS_KEYS.backgroundUrl, ""));
+  useEffect(() => save(LS_KEYS.backgroundUrl, bgUrl), [bgUrl]);
 
   // Core data (persisted)
   const [products, setProducts] = useState<Product[]>([]);
@@ -387,9 +390,17 @@ export default function PawnshopPortalApp() {
           onToggleDark={() => setDark((d) => !d)}
         />
 
+        {/* Global style injector for animations */}
+        <StyleInjector />
+
         <main className="mx-auto max-w-6xl px-4 py-6">
           {route === "catalog" && (
-            <Catalog products={products} onApply={() => setRoute("applyJob")} />
+            <Catalog
+              products={products}
+              onApply={() => setRoute("applyJob")}
+              backgroundUrl={bgUrl}
+            />
+          )} />
           )}
 
           {route === "businessLogin" && (
@@ -398,6 +409,7 @@ export default function PawnshopPortalApp() {
 
           {route === "businessPortal" && session?.role === "business" && (
             <BusinessPortal
+              businessUsername={session.username}
               businessName={session.displayName}
               products={products}
               orders={orders.filter((o) => o.business === session.username)}
@@ -425,6 +437,8 @@ export default function PawnshopPortalApp() {
               onSetApplications={setApplications}
               onSetBusinessUsers={setBusinessUsers}
               onSetAdminUser={setAdminUser}
+              backgroundUrl={bgUrl}
+              onSetBackgroundUrl={setBgUrl}
             />
           )}
 
@@ -518,28 +532,35 @@ function Footer() {
 }
 
 // -------------------- Public Catalog --------------------
-function Catalog({ products, onApply }: { products: Product[]; onApply: () => void }) {
+function Catalog({ products, onApply, backgroundUrl }: { products: Product[]; onApply: () => void; backgroundUrl?: string }) {
   return (
     <div className="space-y-6">
-      {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-r from-yellow-100 via-white to-white p-6 dark:border-neutral-800 dark:from-yellow-900/20 dark:via-neutral-900 dark:to-neutral-900">
+      {/* Hero with animated background */}
+      <BackgroundHero backgroundUrl={backgroundUrl}>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">Shop Catalog</h1>
-            <p className="text-gray-600 dark:text-neutral-400">Clean, game-friendly listing. Log in as a business to order. No public stock counts.</p>
+            <h1 className="text-3xl font-extrabold tracking-tight">Catalog</h1>
+            <p className="text-gray-100/90">Browse our current stock and prices. Businesses can log in to place orders.</p>
           </div>
-          <Button onClick={onApply}>Apply for Job</Button>
+          <Button onClick={onApply}>Apply to work here</Button>
         </div>
-      </div>
+      </BackgroundHero>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {products.map((p) => (
           <Card key={p.id}>
             <div className="flex flex-col gap-2">
-              <div className="text-lg font-semibold">{p.name}</div>
-              {p.description && <div className="text-sm text-gray-600 dark:text-neutral-400">{p.description}</div>}
+              <div className="flex items-center justify-between">
+                <div className="text-lg font-semibold">{p.name}</div>
+                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-neutral-800 dark:text-neutral-200">
+                  {p.stock} in stock
+                </span>
+              </div>
+              {p.description && (
+                <div className="text-sm text-gray-600 dark:text-neutral-400">{p.description}</div>
+              )}
               <div className="mt-1 text-xl font-bold">{money(p.price)}</div>
-              <div className="pt-2 text-xs text-gray-500 dark:text-neutral-500">Login as a business to place orders.</div>
+              <div className="pt-1 text-[10px] text-gray-400">ID: {p.id}</div>
             </div>
           </Card>
         ))}
@@ -573,12 +594,14 @@ function BusinessLogin({ onLogin, onBack }: { onLogin: (u: string, p: string) =>
 }
 
 function BusinessPortal({
+  businessUsername,
   businessName,
   products,
   orders,
   onPlaceOrder,
   onGoCatalog,
 }: {
+  businessUsername: string;
   businessName: string;
   products: Product[];
   orders: Order[];
@@ -764,7 +787,8 @@ function labelForStatus(s: FulfillmentStatus) {
 function renderInvoiceText(o: Order) {
   const lines = o.items
     .map((it) => ` - ${it.qty} × ${it.productId}`)
-    .join("\n");
+    .join("
+");
   return `INVOICE ${o.invoice.id}
 Business: ${o.business}
 Date: ${new Date(o.invoice.date).toLocaleString()}
@@ -835,6 +859,8 @@ function AdminPanel({
   onSetApplications,
   onSetBusinessUsers,
   onSetAdminUser,
+  backgroundUrl,
+  onSetBackgroundUrl,
 }: {
   products: Product[];
   orders: Order[];
@@ -849,6 +875,8 @@ function AdminPanel({
   onSetApplications: (apps: Application[]) => void;
   onSetBusinessUsers: (users: BusinessUser[]) => void;
   onSetAdminUser: (u: { username: string; password: string }) => void;
+  backgroundUrl?: string;
+  onSetBackgroundUrl?: (url: string) => void;
 }) {
   const [tab, setTab] = useState<"products" | "orders" | "applications" | "users" | "settings">("products");
 
@@ -902,7 +930,7 @@ function AdminPanel({
       )}
 
       {tab === "settings" && (
-        <SettingsTab adminUser={adminUser} onSetAdminUser={onSetAdminUser} />
+        <SettingsTab adminUser={adminUser} onSetAdminUser={onSetAdminUser} backgroundUrl={backgroundUrl} onSetBackgroundUrl={onSetBackgroundUrl} />
       )}
     </div>
   );
@@ -1184,7 +1212,7 @@ function UsersTab({ users, onSetUsers }: { users: BusinessUser[]; onSetUsers: (u
   );
 }
 
-function SettingsTab({ adminUser, onSetAdminUser }: { adminUser: { username: string; password: string }; onSetAdminUser: (u: { username: string; password: string }) => void }) {
+function SettingsTab({ adminUser, onSetAdminUser, backgroundUrl, onSetBackgroundUrl }: { adminUser: { username: string; password: string }; onSetAdminUser: (u: { username: string; password: string }) => void; backgroundUrl?: string; onSetBackgroundUrl?: (u: string) => void }) {
   const [form, setForm] = useState(adminUser);
   return (
     <Card>
@@ -1196,8 +1224,55 @@ function SettingsTab({ adminUser, onSetAdminUser }: { adminUser: { username: str
           <Button onClick={() => onSetAdminUser(form)}>Save</Button>
         </div>
       </div>
-      <p className="mt-3 text-xs text-gray-500 dark:text-neutral-500">Passwords are stored in <code>localStorage</code> for demo purposes only.</p>
+      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="md:col-span-2">
+          <TextInput label="Background Image URL (shop photo)" value={backgroundUrl || ""} onChange={(e) => onSetBackgroundUrl && onSetBackgroundUrl(e.target.value)} placeholder="Paste your shop image URL here" />
+        </div>
+        <div className="flex items-end">
+          <Button variant="ghost" onClick={() => onSetBackgroundUrl && onSetBackgroundUrl("")}>Clear</Button>
+        </div>
+      </div>
+      <p className="mt-3 text-xs text-gray-500 dark:text-neutral-500">Passwords are stored in <code>localStorage</code>. The background URL is also saved so your animated hero can use your shop photo.</p>
     </Card>
+  );
+}
+
+// -------------------- Animated Background Components & Styles --------------------
+function StyleInjector() {
+  return (
+    <style>{`
+      @keyframes panZoom { 0% { transform: scale(1) translateY(0); } 100% { transform: scale(1.08) translateY(-2%); } }
+      @keyframes neonFlicker { 0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; } 20%, 24%, 55% { opacity: .4; } }
+      @keyframes sweep { 0% {transform: translateX(-100%);} 100% {transform: translateX(100%);} }
+    `}</style>
+  );
+}
+
+function BackgroundHero({ backgroundUrl, children }: { backgroundUrl?: string; children: React.ReactNode }) {
+  return (
+    <div className="relative mb-6 overflow-hidden rounded-2xl border border-gray-200 dark:border-neutral-800">
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: backgroundUrl
+            ? `url(${backgroundUrl})`
+            : "linear-gradient(135deg, #111 0%, #333 100%)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "saturate(1.05)",
+          animation: "panZoom 20s ease-in-out infinite alternate",
+        }}
+      />
+      {/* dark overlay */}
+      <div className="absolute inset-0 bg-black/40" />
+      {/* neon sign glow bar */}
+      <div className="pointer-events-none absolute left-4 top-4 h-10 w-64 rounded-md bg-yellow-300/70 blur-md" style={{ animation: "neonFlicker 6s infinite" }} />
+      {/* moving light sweep */}
+      <div className="pointer-events-none absolute inset-y-0 w-1/3 bg-white/5" style={{ animation: "sweep 9s linear infinite" }} />
+      <div className="relative z-10 p-6 text-white">
+        {children}
+      </div>
+    </div>
   );
 }
 
