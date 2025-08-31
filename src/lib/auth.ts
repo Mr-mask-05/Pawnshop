@@ -36,6 +36,11 @@ export const authConfig: NextAuthConfig = {
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   callbacks: {
+    async signIn({ user }) {
+      if ((user as any).mustChangePassword) return "/setup/change-password";
+      if ((user as any).mustAddStateId) return "/setup/set-stateid";
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.staffRole = (user as any).staffRole || null;
